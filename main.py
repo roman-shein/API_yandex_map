@@ -1,16 +1,22 @@
-import pygame
+import sys
+
+from PyQt6 import uic
+from PyQt6.QtWidgets import QApplication, QMainWindow
+
+
+class Map(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi("main_ui.ui", self)
+
+
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
 
 
 if __name__ == "__main__":
-    pygame.init()
-    size = WIDTH, HEIGHT = 800, 600
-    screen = pygame.display.set_mode(size)
-
-    running = True
-
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-    pygame.quit()
+    app = QApplication(sys.argv)
+    ex = Map()
+    ex.show()
+    sys.excepthook = except_hook
+    sys.exit(app.exec())
