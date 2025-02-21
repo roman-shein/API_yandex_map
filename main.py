@@ -2,6 +2,7 @@ import sys
 import requests
 
 from PyQt6 import uic
+from PyQt6.QtGui import QPixmap, QPalette, QColor
 from PyQt6.QtWidgets import QApplication, QMainWindow
 
 
@@ -10,31 +11,33 @@ class Map(QMainWindow):
         super().__init__()
         uic.loadUi("main_ui.ui", self)
 
-        self.ll = "33.082455,68.968649"
-        self.spn = "1"
-
-        # params map
+        self.ll = ["33.082455", "68.968649"]
+        self.spn = "1,1"
         self.server_address_maps = "https://static-maps.yandex.ru/v1?"
         self.map_params = {
-            "ll": self.ll,
+            "ll": ','.join(self.ll),
             "spn": self.spn,
             "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7"
         }
+        self.make_map(self.server_address_maps, self.map_params)
+        self.pixmap = None
+        self.label.resize(585, 585)
+        self.label.setStyleSheet("background-color: lightgreen")
+        self.start.clicked.connect(lambda x: self.make_map(self.server_address_maps, self.map_params))
 
-        self.map = make_map(self.server_address_maps, self.map_params)
 
+    def make_map(self, server_address_maps, maps_params):
+        response = requests.get(server_address_maps, maps_params)
+        if not response:
+            print(response.text)
+            return None
 
-def make_map(server_address_maps, maps_params):
-    response = requests.get(server_address_maps, maps_params)
-    if not response:
-        return None
+        map_file = "map.png"
 
-    map_file = "map.png"
-
-    with open(map_file, "wb") as file:
-        file.write(response.content)
-
-    return map_file
+        with open(map_file, "wb") as file:
+            file.write(response.content)
+        self.pixmap = QPixmap(map_file)
+        self.label.setPixmap(self.pixmap)
 
 
 def except_hook(cls, exception, traceback):
