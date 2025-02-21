@@ -2,6 +2,7 @@ import sys
 import requests
 
 from PyQt6 import uic
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QPalette, QColor
 from PyQt6.QtWidgets import QApplication, QMainWindow
 
@@ -23,6 +24,9 @@ class Map(QMainWindow):
         self.pixmap = None
         self.label.resize(585, 585)
         self.label.setStyleSheet("background-color: lightgreen")
+        self.shir.setEnabled(False)
+        self.dol.setEnabled(False)
+        self.start.setEnabled(False)
         self.start.clicked.connect(lambda x: self.make_map(self.server_address_maps, self.map_params))
 
     def make_map(self, server_address_maps, maps_params):
@@ -40,6 +44,7 @@ class Map(QMainWindow):
         self.label.setPixmap(self.pixmap)
 
     def keyPressEvent(self, event):
+        print(event.key())
         if event.key() == 51:
             self.spn = [str(min(0.1, float(self.spn[0]) + 0.01))]
             self.map_params = {
@@ -50,6 +55,26 @@ class Map(QMainWindow):
             self.make_map(self.server_address_maps, self.map_params)
         if event.key() == 57:
             self.spn = [str(max(0.001, float(self.spn[0]) - 0.01))]
+            self.map_params = {
+                "ll": ','.join(self.ll),
+                "spn": ','.join(self.spn + self.spn),
+                "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7"
+            }
+            self.make_map(self.server_address_maps, self.map_params)
+        sme = False
+        if event.key() == Qt.Key.Key_Left:
+            self.ll[0] = str(float(self.ll[0]) - float(self.spn[0]) / 2)
+            sme = True
+        if event.key() == Qt.Key.Key_Right:
+            self.ll[0] = str(float(self.ll[0]) + float(self.spn[0]) / 2)
+            sme = True
+        if event.key() == Qt.Key.Key_Up:
+            self.ll[1] = str(float(self.ll[1]) + float(self.spn[0]) / 2)
+            sme = True
+        if event.key() == Qt.Key.Key_Down:
+            self.ll[1] = str(float(self.ll[1]) - float(self.spn[0]) / 2)
+            sme = True
+        if sme:
             self.map_params = {
                 "ll": ','.join(self.ll),
                 "spn": ','.join(self.spn + self.spn),
