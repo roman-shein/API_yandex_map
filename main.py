@@ -18,7 +18,8 @@ class Map(QMainWindow):
         self.map_params = {
             "ll": ','.join(self.ll),
             "spn": ','.join(self.spn + self.spn),
-            "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7"
+            "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7",
+            "theme": "light"
         }
         self.make_map(self.server_address_maps, self.map_params)
         self.pixmap = None
@@ -30,6 +31,15 @@ class Map(QMainWindow):
         self.dark.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.light.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.start.clicked.connect(lambda x: self.make_map(self.server_address_maps, self.map_params))
+        self.dark.toggled.connect(self.theme)
+        self.light.toggled.connect(self.theme)
+
+    def theme(self):
+        if self.light.isChecked():
+            self.map_params["theme"] = "light"
+        elif self.dark.isChecked():
+            self.map_params["theme"] = "dark"
+        self.make_map(self.server_address_maps, self.map_params)
 
     def make_map(self, server_address_maps, maps_params):
         response = requests.get(server_address_maps, maps_params)
