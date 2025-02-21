@@ -31,6 +31,7 @@ class Map(QMainWindow):
         self.dark.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.light.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.start.clicked.connect(lambda x: self.make_map(self.server_address_maps, self.map_params))
+        self.light.setChecked(True)
         self.dark.toggled.connect(self.theme)
         self.light.toggled.connect(self.theme)
 
