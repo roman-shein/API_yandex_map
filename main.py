@@ -22,8 +22,8 @@ class Map(QMainWindow):
         }
         self.make_map(self.server_address_maps, self.map_params)
         self.pixmap = None
-        self.label.resize(585, 585)
-        self.label.setStyleSheet("background-color: lightgreen")
+        self.im.resize(585, 585)
+        self.im.setStyleSheet("background-color: lightgreen")
         self.shir.setEnabled(False)
         self.dol.setEnabled(False)
         self.start.setEnabled(False)
@@ -41,11 +41,11 @@ class Map(QMainWindow):
             file.write(response.content)
 
         self.pixmap = QPixmap(map_file)
-        self.label.setPixmap(self.pixmap)
+        self.im.setPixmap(self.pixmap)
 
     def keyPressEvent(self, event):
         print(event.key())
-        if event.key() == 51:
+        if event.key() == Qt.Key.Key_PageDown:
             self.spn = [str(min(0.1, float(self.spn[0]) + 0.01))]
             self.map_params = {
                 "ll": ','.join(self.ll),
@@ -53,7 +53,7 @@ class Map(QMainWindow):
                 "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7"
             }
             self.make_map(self.server_address_maps, self.map_params)
-        if event.key() == 57:
+        if event.key() == Qt.Key.Key_PageUp:
             self.spn = [str(max(0.001, float(self.spn[0]) - 0.01))]
             self.map_params = {
                 "ll": ','.join(self.ll),
