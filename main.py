@@ -4,7 +4,7 @@ import requests
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QPalette, QColor
-from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6.QtWidgets import QApplication, QMainWindow, QLineEdit, QMessageBox
 
 
 class Map(QMainWindow):
@@ -15,6 +15,7 @@ class Map(QMainWindow):
         self.ll = ["33.082455", "68.968649"]
         self.spn = ['0.1']
         self.server_address_maps = "https://static-maps.yandex.ru/v1?"
+        self.geocoder_server = "https://geocode-maps.yandex.ru/1.x/"
         self.map_params = {
             "ll": ','.join(self.ll),
             "spn": ','.join(self.spn + self.spn),
@@ -25,8 +26,6 @@ class Map(QMainWindow):
         self.pixmap = None
         self.im.resize(585, 585)
         self.im.setStyleSheet("background-color: lightgreen")
-        self.shir.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.dol.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.start.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.dark.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.light.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
@@ -34,6 +33,8 @@ class Map(QMainWindow):
         self.light.setChecked(True)
         self.dark.toggled.connect(self.theme)
         self.light.toggled.connect(self.theme)
+
+        self.text.returnPressed.connect(self.search_object)
 
     def theme(self):
         if self.light.isChecked():
@@ -100,6 +101,47 @@ class Map(QMainWindow):
                 "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7"
             }
             self.make_map(self.server_address_maps, self.map_params)
+
+    def search_object(self):
+        search_text = self.text.text().strip()
+        if not search_text:
+            return
+
+        geocoder_params = {
+            "geocode": search_text,
+            "apikey": "7baececd-be0e-4475-a6ae-f15bef0b9622",
+            "format": "json"
+        }
+
+        try:
+            response = requests.get(self.geocoder_server, params=geocoder_params)
+            if response.status_code != 200:
+                QMessageBox.warning(self, "Ошибка", "Не удалось выполнить запрос к геокодеру")
+                return
+
+            data = response.json()
+
+            # Get the first feature
+            features = data["response"]["GeoObjectCollection"]["featureMember"]
+            if not features:
+                QMessageBox.warning(self, "Ошибка", "Объект не найден")
+                return
+
+            feature = features[0]["GeoObject"]
+            pos = feature["Point"]["pos"]
+            self.ll = pos.split()
+
+            # Update map parameters with new coordinates and add marker
+            self.map_params.update({
+                "ll": ','.join(self.ll),
+                "spn": ','.join(self.spn + self.spn),
+                "pt": ','.join(self.ll + ["pm2dgl"])  # Add marker
+            })
+
+            self.make_map(self.server_address_maps, self.map_params)
+
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка: {str(e)}")
 
 
 def except_hook(cls, exception, traceback):
