@@ -16,6 +16,7 @@ class Map(QMainWindow):
         self.spn = ['0.1']
         self.server_address_maps = "https://static-maps.yandex.ru/v1?"
         self.geocoder_server = "https://geocode-maps.yandex.ru/1.x/"
+        self.metki = []
         self.map_params = {
             "ll": ','.join(self.ll),
             "spn": ','.join(self.spn + self.spn),
@@ -69,7 +70,8 @@ class Map(QMainWindow):
             self.map_params = {
                 "ll": ','.join(self.ll),
                 "spn": ','.join(self.spn + self.spn),
-                "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7"
+                "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7",
+                "pt": ','.join(self.metki)
             }
             self.make_map(self.server_address_maps, self.map_params)
         if event.key() == Qt.Key.Key_PageUp:
@@ -78,7 +80,8 @@ class Map(QMainWindow):
             self.map_params = {
                 "ll": ','.join(self.ll),
                 "spn": ','.join(self.spn + self.spn),
-                "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7"
+                "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7",
+                "pt": ','.join(self.metki)
             }
             self.make_map(self.server_address_maps, self.map_params)
         sme = False
@@ -98,7 +101,8 @@ class Map(QMainWindow):
             self.map_params = {
                 "ll": ','.join(self.ll),
                 "spn": ','.join(self.spn + self.spn),
-                "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7"
+                "apikey": "ef67d706-4387-4517-8b08-50f4c0929dd7",
+                "pt": ','.join(self.metki)
             }
             self.make_map(self.server_address_maps, self.map_params)
 
@@ -129,13 +133,14 @@ class Map(QMainWindow):
 
             feature = features[0]["GeoObject"]
             pos = feature["Point"]["pos"]
+            self.metki.append(','.join(pos.split() + ["pm2dgl"]))
             self.ll = pos.split()
 
             # Update map parameters with new coordinates and add marker
             self.map_params.update({
                 "ll": ','.join(self.ll),
                 "spn": ','.join(self.spn + self.spn),
-                "pt": ','.join(self.ll + ["pm2dgl"])  # Add marker
+                "pt": ','.join(self.metki)  # Add marker
             })
 
             self.make_map(self.server_address_maps, self.map_params)
