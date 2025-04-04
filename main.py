@@ -1,10 +1,12 @@
 import sys
+from tkinter.ttk import Label
+
 import requests
 
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QPalette, QColor
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLineEdit, QMessageBox
+from PyQt6.QtWidgets import QApplication, QMainWindow, QLineEdit, QMessageBox, QLabel
 
 
 class Map(QMainWindow):
@@ -141,17 +143,18 @@ class Map(QMainWindow):
             self.map_params.update({
                 "ll": ','.join(self.ll),
                 "spn": ','.join(self.spn + self.spn),
-                "pt": ','.join(self.metki)  # Add marker
+                "pt": '~'.join(self.metki)
             })
-
+            self.adress.setText(
+                feature['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AddressLine'])
             self.make_map(self.server_address_maps, self.map_params)
 
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Произошла ошибка: {str(e)}")
 
-
     def reset_metki(self):
         self.metki = []
+        self.adress.setText('')
         self.map_params.update({
             "ll": ','.join(self.ll),
             "spn": ','.join(self.spn + self.spn),
@@ -159,7 +162,6 @@ class Map(QMainWindow):
         })
 
         self.make_map(self.server_address_maps, self.map_params)
-
 
 
 def except_hook(cls, exception, traceback):
