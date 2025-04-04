@@ -59,6 +59,10 @@ class Map(QMainWindow):
 
     def keyPressEvent(self, event):
         print(event.key())
+        # Снимаем фокус с text при нажатии любых стрелочек
+        if event.key() in (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down):
+            self.text.clearFocus()
+
         if event.key() == Qt.Key.Key_PageDown:
             self.clearFocus()
             self.spn = [str(min(0.1, float(self.spn[0]) + 0.01))]
@@ -79,19 +83,15 @@ class Map(QMainWindow):
             self.make_map(self.server_address_maps, self.map_params)
         sme = False
         if event.key() == Qt.Key.Key_Left:
-            self.clearFocus()
             self.ll[0] = str(float(self.ll[0]) - float(self.spn[0]) / 2)
             sme = True
         if event.key() == Qt.Key.Key_Right:
-            self.clearFocus()
             self.ll[0] = str(float(self.ll[0]) + float(self.spn[0]) / 2)
             sme = True
         if event.key() == Qt.Key.Key_Up:
-            self.clearFocus()
             self.ll[1] = str(float(self.ll[1]) + float(self.spn[0]) / 2)
             sme = True
         if event.key() == Qt.Key.Key_Down:
-            self.clearFocus()
             self.ll[1] = str(float(self.ll[1]) - float(self.spn[0]) / 2)
             sme = True
         if sme:
