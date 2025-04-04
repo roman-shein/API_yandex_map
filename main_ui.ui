@@ -40,7 +40,7 @@
    <widget class="QPushButton" name="start">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>490</x>
       <y>640</y>
       <width>93</width>
       <height>28</height>
@@ -100,6 +100,19 @@
     </property>
     <property name="text">
      <string>Светлая</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>640</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Полный сброс</string>
     </property>
    </widget>
   </widget>
