@@ -34,6 +34,7 @@ class Map(QMainWindow):
         self.light.setChecked(True)
         self.dark.toggled.connect(self.theme)
         self.light.toggled.connect(self.theme)
+        self.pushButton.clicked.connect(self.reset_metki)
 
         self.text.returnPressed.connect(self.search_object)
 
@@ -147,6 +148,18 @@ class Map(QMainWindow):
 
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Произошла ошибка: {str(e)}")
+
+
+    def reset_metki(self):
+        self.metki = []
+        self.map_params.update({
+            "ll": ','.join(self.ll),
+            "spn": ','.join(self.spn + self.spn),
+            "pt": ','.join(self.metki)  # Add marker
+        })
+
+        self.make_map(self.server_address_maps, self.map_params)
+
 
 
 def except_hook(cls, exception, traceback):
