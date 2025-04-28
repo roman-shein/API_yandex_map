@@ -200,15 +200,15 @@ class Map(QMainWindow):
                 "spn": ','.join(self.spn + self.spn),
                 "pt": '~'.join(self.metki)
             })
-            text = feature['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AddressLine']
+            self.obj = feature['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AddressLine']
 
             try:
                 self.ind = feature['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']
                 if self.index.isChecked():
-                    text += f" {self.ind}"
-                    self.adress.setText(text)
+                    arr = [self.obj, self.ind]
+                    self.adress.setText(' '.join(arr))
                 else:
-                    self.adress.setText(text)
+                    self.adress.setText(self.obj)
 
             except Exception:
                 self.adress.setText("Недостаточно данных")
@@ -231,14 +231,10 @@ class Map(QMainWindow):
 
     def index_check(self):
         if self.index.isChecked():
-            text = self.adress.text()
-            if self.ind:
-                text += f" {self.ind}"
-            self.adress.setText(text)
+            arr = [self.obj, self.ind]
+            self.adress.setText(" ".join(arr))
         else:
-            text = self.adress.text()
-            text = " ".join(text.split()[:-1])
-            self.adress.setText(text)
+            self.adress.setText(self.obj)
 
 
 def except_hook(cls, exception, traceback):
