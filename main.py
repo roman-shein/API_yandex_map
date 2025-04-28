@@ -1,8 +1,5 @@
 import sys
-from tkinter.ttk import Label
-
 import requests
-
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QPalette, QColor
@@ -77,6 +74,7 @@ class Map(QMainWindow):
                 "pt": ','.join(self.metki)
             }
             self.make_map(self.server_address_maps, self.map_params)
+            self.theme()
         if event.key() == Qt.Key.Key_PageUp:
             self.clearFocus()
             self.spn = [str(max(0.001, float(self.spn[0]) - 0.01))]
@@ -87,6 +85,7 @@ class Map(QMainWindow):
                 "pt": ','.join(self.metki)
             }
             self.make_map(self.server_address_maps, self.map_params)
+            self.theme()
         sme = False
         if event.key() == Qt.Key.Key_Left:
             self.ll[0] = str(float(self.ll[0]) - float(self.spn[0]) / 2)
@@ -108,6 +107,7 @@ class Map(QMainWindow):
                 "pt": ','.join(self.metki)
             }
             self.make_map(self.server_address_maps, self.map_params)
+            self.theme()
 
     def search_object(self):
         search_text = self.text.text().strip()
