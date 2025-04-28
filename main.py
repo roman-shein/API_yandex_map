@@ -3,7 +3,7 @@ import requests
 from PyQt6 import uic, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QPalette, QColor
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLineEdit, QMessageBox, QLabel
+from PyQt6.QtWidgets import QApplication, QMainWindow, QLineEdit, QMessageBox, QLabel, QCheckBox
 
 
 class Map(QMainWindow):
@@ -36,6 +36,8 @@ class Map(QMainWindow):
         self.pushButton.clicked.connect(self.reset_metki)
 
         self.text.returnPressed.connect(self.search_object)
+        self.index.toggled.connect(self.index_check)
+        self.ind = ''
 
     def theme(self):
         if self.light.isChecked():
@@ -145,8 +147,19 @@ class Map(QMainWindow):
                 "spn": ','.join(self.spn + self.spn),
                 "pt": '~'.join(self.metki)
             })
-            self.adress.setText(
-                feature['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AddressLine'])
+            text = feature['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AddressLine']
+
+            try:
+                if self.index.isChecked():
+                    self.ind = feature['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']
+                    text += f" {self.ind}"
+                    self.adress.setText(text)
+                else:
+                    self.adress.setText(text)
+
+            except Exception:
+                self.adress.setText("Недостаточно данных")
+
             self.make_map(self.server_address_maps, self.map_params)
 
         except Exception as e:
@@ -163,6 +176,14 @@ class Map(QMainWindow):
 
         self.make_map(self.server_address_maps, self.map_params)
 
+    def index_check(self):
+        if self.index.isChecked():
+            text = self.adress.text()
+            text += f" {self.ind}"
+            print(self.ind)
+            self.adress.setText(text)
+        else:
+            pass
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
