@@ -34,10 +34,56 @@ class Map(QMainWindow):
         self.dark.toggled.connect(self.theme)
         self.light.toggled.connect(self.theme)
         self.pushButton.clicked.connect(self.reset_metki)
-
         self.text.returnPressed.connect(self.search_object)
         self.index.toggled.connect(self.index_check)
         self.ind = ''
+        self.im.setMouseTracking(True)
+        self.im.mousePressEvent = self.map_click_handler
+
+    def pixel_to_geo(self, x, y):
+        map_width = self.im.width()
+        map_height = self.im.height()
+        center_lon, center_lat = map(float, self.ll)
+        spn = float(self.spn[0])
+        lon_per_pixel = spn * 2 / map_width
+        lat_per_pixel = spn * 2 / map_height
+        lon = center_lon + (x - map_width / 2) * lon_per_pixel
+        lat = center_lat - (y - map_height / 2) * lat_per_pixel
+
+        return lat, lon
+
+    def reverse_geocode(self, lat, lon):
+        geocoder_params = {
+            "geocode": f"{lon},{lat}",
+            "apikey": "7baececd-be0e-4475-a6ae-f15bef0b9622",
+            "format": "json"
+        }
+
+        try:
+            response = requests.get(self.geocoder_server, params=geocoder_params)
+            if response.status_code != 200:
+                QMessageBox.warning(self, "Ошибка", "Не удалось выполнить запрос к геокодеру")
+                return
+
+            data = response.json()
+
+            features = data["response"]["GeoObjectCollection"]["featureMember"]
+            if not features:
+                QMessageBox.warning(self, "Ошибка", "Адрес не найден")
+                return
+
+            feature = features[0]["GeoObject"]
+            self.reset_metki()
+            self.metki.append(','.join([str(lon), str(lat), "pm2dgl"]))  # Добавляем новую метку
+            self.map_params.update({
+                "pt": '~'.join(self.metki)
+            })
+            address = feature['metaDataProperty']['GeocoderMetaData']['text']
+            self.adress.setText(address)
+            self.make_map(self.server_address_maps, self.map_params)
+
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка: {str(e)}")
 
     def theme(self):
         if self.light.isChecked():
@@ -59,6 +105,13 @@ class Map(QMainWindow):
 
         self.pixmap = QPixmap(map_file)
         self.im.setPixmap(self.pixmap)
+
+    def map_click_handler(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            x = event.pos().x()
+            y = event.pos().y()
+            lat, lon = self.pixel_to_geo(x, y)
+            self.reverse_geocode(lat, lon)
 
     def keyPressEvent(self, event):
         print(event.key())
@@ -186,6 +239,7 @@ class Map(QMainWindow):
             text = self.adress.text()
             text = " ".join(text.split()[:-1])
             self.adress.setText(text)
+
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
